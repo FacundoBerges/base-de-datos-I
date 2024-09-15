@@ -1,0 +1,36 @@
+1) Tabla: ALUMNOS
+
+LEGAJO 	NOMBRE 		DOMICILIO 	LOCALIDAD 	EDAD
+6097 	Perez, Juan 	Nazca 920 	Capital Federal 19
+6102 	Gomez, Alex 	Artigas 1230 	Capital Federal 20
+6110 	Pari, Oscar 	Puán 760 	Capital Federal 21
+6115 	Nero, Franco 	Mitre 545 	Avellaneda 	19
+6123 	Menen, Ana 	Mitre 670 	Avellaneda 	18
+6130 	Roca, Alicia 	Alsina 54 	Ramos Mejía 	22
+
+A) Qué cardinalidad tiene esta relación?
+B) Cuál es el grado de la relación?
+C) Dicha tabla representa una entidad o una interrelación? Justificar.
+
+A. Cardinalidad 6 (cantidad de filas/tuplas).
+B. Grado de relación 5 (cantidad de columnas/atributos).
+C. Representa una entidad ya que no se relaciona con una tabla ajena.
+
+2) Tabla1
+
+LEGAJO 	MATERIA 	NOTA
+6097 	Matemática 	7
+6097 	Programación I 	8
+6102 	Programación I 	5
+6102 	Programación II 7
+6115 	Matemática 	4
+6123 	Laboratorio I 	9
+6123 	Bases de Datos 	9
+
+A) Definir el dominio para la columna NOTA.
+B) Colocar un nombre técnico a la relación.
+C) Indicar cuál o cuáles campos pueden identificar a la fila unívocamente.
+
+A. El dominio (rango de valores válidos como atributo) es del 1 al 10.
+B. NOTAS_ALUMNOS
+C. Los campos que pueden identificar a la fila son LEGAJO y MATERIA conjuntamente.
