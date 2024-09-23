@@ -99,9 +99,33 @@ WHERE 	PP.NUMERO = 103
 	AND PP.PNRO = 1;
 
 -- 6) Obtener los números de los productos y localidades en los cuales la segunda letra del nombre de la localidad sea A. 
+
+SELECT PROD.PNRO, PROD.LOCALIDAD
+FROM PRODUCTOS PROD
+WHERE UPPER(PROD.LOCALIDAD) LIKE '_A%';
+
 -- 7) Obtener los precios de los productos enviados por el proveedor 102. 
+
+SELECT PROD.PRECIO
+FROM PRODUCTOS PROD, PROVEEDORES PROV, PROV-PROD PP
+WHERE PROV.NUMERO = 102
+	AND PROV.NUMERO = PP.NUMERO
+	AND PP.PNRO = PROD.PNRO;
+
 -- 8) Construir una lista de todas las localidades en las cuales esté situado por lo menos un proveedor o un producto. 
+
+SELECT DISTINCT PROD.LOCALIDAD
+FROM PRODUCTOS PROD
+UNION
+SELECT DISTINCT PROV.LOCALIDAD
+FROM PROVEEDORES PROV;
+
 -- 9) Cambiar a “Chico” el tamaño de todos los productos medianos. 
+
+UPDATE PRODUCTOS PROD
+SET PROD.TAMAÑO = 'Chico'
+WHERE UPPER(PROD.TAMAÑO) = 'MEDIANO';
+
 -- 10) Eliminar todos lo sproductos para los cuales no haya envíos. 
 -- 11) Insertar un nuevo proveedor (107) en la tabla PROVEEDORES. El nombre y la localidad son Rosales y Wilde respectivamente; el domicilio no se conoce todavía. 
 
