@@ -180,15 +180,96 @@ CREATE TABLE ITEM_VENTAS
 	FOREIGN KEY (CÓDIGO_PRODUCTO) REFERENCES PRODUCTOS (CÓDIGO_PRODUCTO)
 );
 
+INSERT INTO CLIENTES (CÓDIGO_CLIENTE, NOMBRE, DOMICILIO, PROVINCIA)
+VALUES	(1, 'Thiago', 'Saavedra 567', 'Chaco'),
+		(2, 'Mateo', 'Saavedra 567', 'Santa Fe'),
+		(3, 'Valentina', 'Moreno 789', 'Salta'),
+		(4, 'Emanuel', 'Moreno 789', 'Corrientes'),
+		(5, 'Mia', 'Saavedra 567', 'Córdoba'),
+		(6, 'Martín', 'San Martin 456', 'Tucumán'),
+		(7, 'Mariana', 'Saavedra 567', 'Entre Ríos'),
+		(8, 'Isabella', 'Belgrano 123', 'Tucumán'),
+		(9, 'Lucas', 'Moreno 789', 'Chaco'),
+		(10, 'Emma', 'Castelli 234', 'Córdoba');
+
+INSERT INTO PRODUCTOS (CÓDIGO_PRODUCTO, NOMBRE_PRODUCTO)
+VALUES	(1, 'Zanahoria'),
+		(2, 'Papa'),
+		(3, 'Tomate'),
+		(4, 'Lechuga'),
+		(5, 'Cebolla');
+
+INSERT INTO VENTAS (NÚMERO_FACTURA, CÓDIGO_CLIENTE, FECHA)
+VALUES 	(1, 1, '2023-11-24'),
+		(2, 2, '2023-11-16'),
+		(3, 3, '2024-05-10'),
+		(4, 4, '2024-08-08'),
+		(5, 5, '2023-12-02'),
+		(6, 6, '2024-02-16'),
+		(7, 7, '2024-07-14'),
+		(8, 8, '2024-03-14'),
+		(9, 9, '2023-10-22'),
+		(10, 10, '2024-01-01');
+
+INSERT INTO ITEM_VENTAS (NÚMERO_FACTURA, CÓDIGO_PRODUCTO, CANTIDAD, PRECIO)
+VALUES	(1, 4, 7, 657.33),
+		(2, 1, 5, 766.47),
+		(3, 3, 2, 673.51),
+		(4, 4, 6, 358.62),
+		(5, 1, 5, 949.7),
+		(6, 3, 5, 521.34),
+		(7, 2, 3, 652.34),
+		(8, 2, 1, 275.8),
+		(9, 3, 1, 394.66),
+		(10, 4, 7, 515.63),
+		(2, 5, 31, 10235.33),
+		(4, 2, 30, 15235.33);
 
 -- Resolver las siguientes consultas: 
 
 -- 1. Obtener la cantidad de unidades máxima.
 
-
+SELECT MAX(CANTIDAD)
+FROM ITEM_VENTAS;
 
 -- 2. Obtener la cantidad total de unidades vendidas del producto c. 
+
+SELECT SUM(CANTIDAD)
+FROM ITEM_VENTAS
+WHERE CÓDIGO_PRODUCTO = 3;
+
 -- 3. Cantidad de unidades vendidas por producto, indicando la descripción del producto, ordenado de mayor a menor por las cantidades vendidas.  
+
+SELECT SUM(I.CANTIDAD) AS CANTIDAD, P.NOMBRE_PRODUCTO AS DESCRIPCION_PRODUCTO 
+FROM ITEM_VENTAS I
+JOIN PRODUCTOS P ON I.CÓDIGO_PRODUCTO = P.CÓDIGO_PRODUCTO
+GROUP BY P.CÓDIGO_PRODUCTO;
+
 -- 4. Cantidad de unidades vendidas por producto, indicando la descripción del producto, ordenado alfabéticamente por nombre de producto para los productos que vendieron más de 30 unidades.  
+
+SELECT SUM(I.CANTIDAD) AS CANTIDAD, P.NOMBRE_PRODUCTO AS  DESCRIPCION_PRODUCTO 
+FROM ITEM_VENTAS I
+JOIN PRODUCTOS P ON I.CÓDIGO_PRODUCTO = P.CÓDIGO_PRODUCTO
+GROUP BY P.CÓDIGO_PRODUCTO
+HAVING CANTIDAD > 30
+ORDER BY DESCRIPCION_PRODUCTO ASC;
+
 -- 5. Obtener cuantas compras (1 factura = 1 compra) realizó cada cliente indicando el código y nombre del cliente ordenado de mayor a menor.  
+
+SELECT COUNT(V.NÚMERO_FACTURA) AS CANTIDAD_COMPRAS, V.CÓDIGO_CLIENTE AS CÓDIGO_CLIENTE, C.NOMBRE AS NOMBRE_CLIENTE
+FROM VENTAS V
+JOIN CLIENTES C ON V.CÓDIGO_CLIENTE = C.CÓDIGO_CLIENTE
+GROUP BY V.CÓDIGO_CLIENTE
+ORDER BY C.NOMBRE DESC;
+
 -- 6. Promedio de unidades vendidas por producto, indicando el código del producto para el cliente 1. 
+
+SELECT P.CÓDIGO_PRODUCTO AS CÓDIGO_PRODUCTO, AVG(I.CANTIDAD) AS PROMEDIO_UNIDADES_VENDIDAS
+FROM ITEM_VENTAS I
+JOIN PRODUCTOS P ON I.CÓDIGO_PRODUCTO = P.CÓDIGO_PRODUCTO
+WHERE I.NÚMERO_FACTURA IN (
+	SELECT V.NÚMERO_FACTURA
+	FROM VENTAS V
+	WHERE V.CÓDIGO_CLIENTE = 1
+)
+GROUP BY P.CÓDIGO_PRODUCTO;
