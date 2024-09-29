@@ -273,3 +273,371 @@ WHERE I.NÚMERO_FACTURA IN (
 	WHERE V.CÓDIGO_CLIENTE = 1
 )
 GROUP BY P.CÓDIGO_PRODUCTO;
+
+
+DROP TABLE ITEM_VENTAS;
+DROP TABLE VENTAS;
+DROP TABLE PRODUCTOS;
+DROP TABLE CLIENTES;
+
+
+-- EJERCICIOS DE TABLA 3 
+
+-- Se tiene la siguiente base de datos relacional:
+-- 		Documentos (cod_documento, descripción)
+--		Oficinas (cod_oficina, codigo_director, descripcion)
+-- 		Empleados (cod_empleado, apellido, nombre, fecha_nacimiento, num_doc, cod_jefe, cod_oficina, cod_documento)
+--		Datos_contratos (cod_empleado, fecha_contrato, cuota, ventas) 
+-- 		Fabricantes (cod_fabricante, razón_social) 
+-- 		Listas (cod_lista, descripción, ganancia) 
+-- 		Productos (cod_producto, descripcion, precio, cantidad_stock, punto_reposición, cod_fabricante) 
+-- 		Precios (cod_producto, cod_lista, precio) 
+-- 		Clientes (cod_cliente, cod_lista, razón_social) 
+-- 		Pedidos (cod_pedido, fecha_pedido, cod_empleado, cod_cliente) 
+-- 		Detalle_pedidos (cod_pedido, numero_linea, cod_producto, cantidad) 
+
+CREATE TABLE DOCUMENTOS
+(	COD_DOCUMENTO INT,
+	DESCRIPCION VARCHAR(25) NOT NULL,
+	PRIMARY KEY (COD_DOCUMENTO)
+);
+
+CREATE TABLE OFICINAS
+(	COD_OFICINA INT,
+	CODIGO_DIRECTOR INT,
+	DESCRIPCION VARCHAR(25) NOT NULL,
+	PRIMARY KEY (COD_OFICINA)
+);
+
+CREATE TABLE EMPLEADOS
+(	COD_EMPLEADO INT,
+	APELLIDO VARCHAR(25) NOT NULL,
+	NOMBRE VARCHAR(25) NOT NULL,
+	FECHA_NACIMIENTO DATE,
+	NUM_DOC VARCHAR(10),
+	COD_JEFE INT,
+	COD_OFICINA INT NOT NULL,
+	COD_DOCUMENTO INT NOT NULL,
+	PRIMARY KEY (COD_EMPLEADO),
+	FOREIGN KEY (COD_DOCUMENTO) REFERENCES DOCUMENTOS (COD_DOCUMENTO),
+	FOREIGN KEY (COD_OFICINA) REFERENCES OFICINAS (COD_OFICINA)
+);
+
+CREATE TABLE DATOS_CONTRATOS
+(	COD_EMPLEADO INT,
+	FECHA_CONTRATO DATE,
+	CUOTA INT,
+	VENTAS INT,
+	PRIMARY KEY (COD_EMPLEADO, FECHA_CONTRATO),
+	FOREIGN KEY (COD_EMPLEADO) REFERENCES EMPLEADOS (COD_EMPLEADO)
+);
+
+CREATE TABLE FABRICANTES
+(	COD_FABRICANTE INT,
+	RAZON_SOCIAL VARCHAR(25) NOT NULL,
+	PRIMARY KEY (COD_FABRICANTE)
+);
+
+CREATE TABLE LISTAS
+(	COD_LISTA INT,
+	DESCRIPCION VARCHAR(25) NOT NULL,
+	GANANCIA DECIMAL(10,2),
+	PRIMARY KEY (COD_LISTA)
+);
+
+CREATE TABLE PRODUCTOS
+(	COD_PRODUCTO INT,
+	DESCRIPCION VARCHAR(25) NOT NULL,
+	PRECIO DECIMAL(10,2),
+	CANTIDAD_STOCK INT,
+	PUNTO_REPOSICION INT,
+	COD_FABRICANTE INT,
+	PRIMARY KEY (COD_PRODUCTO),
+	FOREIGN KEY (COD_FABRICANTE) REFERENCES FABRICANTES (COD_FABRICANTE)
+);
+
+CREATE TABLE PRECIOS
+(	COD_PRODUCTO INT,
+	COD_LISTA INT,
+	PRECIO DECIMAL(10,2),
+	PRIMARY KEY (COD_PRODUCTO, COD_LISTA),
+	FOREIGN KEY (COD_PRODUCTO) REFERENCES PRODUCTOS (COD_PRODUCTO),
+	FOREIGN KEY (COD_LISTA) REFERENCES LISTAS (COD_LISTA)
+);
+
+CREATE TABLE CLIENTES
+(	COD_CLIENTE INT,
+	COD_LISTA INT NOT NULL,
+	RAZON_SOCIAL VARCHAR(25) NOT NULL,
+	PRIMARY KEY (COD_CLIENTE),
+	FOREIGN KEY (COD_LISTA) REFERENCES LISTAS (COD_LISTA)
+);
+
+CREATE TABLE PEDIDOS
+(	COD_PEDIDO INT,
+	FECHA_PEDIDO DATE NOT NULL,
+	COD_EMPLEADO INT,
+	COD_CLIENTE INT,
+	PRIMARY KEY (COD_PEDIDO),
+	FOREIGN KEY (COD_EMPLEADO) REFERENCES EMPLEADOS (COD_EMPLEADO),
+	FOREIGN KEY (COD_CLIENTE) REFERENCES CLIENTES (COD_CLIENTE)
+);
+
+CREATE TABLE DETALLE_PEDIDOS
+(	COD_PEDIDO INT,
+	NUMERO_LINEA INT,
+	COD_PRODUCTO INT,
+	CANTIDAD INT,
+	PRIMARY KEY (COD_PEDIDO, NUMERO_LINEA),
+	FOREIGN KEY (COD_PEDIDO) REFERENCES PEDIDOS (COD_PEDIDO),
+	FOREIGN KEY (COD_PRODUCTO) REFERENCES PRODUCTOS (COD_PRODUCTO)
+);
+
+
+INSERT INTO DOCUMENTOS (COD_DOCUMENTO, DESCRIPCION) 
+VALUES 	(1, 'Factura de compra'),
+		(2, 'Contrato de servicios'),
+		(3, 'Informe de auditoría'),
+		(4, 'Presupuesto de gastos'),
+		(5, 'Plan de negocios');
+
+INSERT INTO OFICINAS (COD_OFICINA, CODIGO_DIRECTOR, DESCRIPCION)
+VALUES	(1, 6, 'Ventas'),
+		(2, 19, 'Recursos Humanos'),
+		(3, 4, 'Marketing'),
+		(4, 16, 'Finanzas'),
+		(5, 12, 'Innovación'),
+		(6, 8, 'Proyectos'),
+		(7, 17, 'Calidad'),
+		(8, NULL, 'Logística'),
+		(9, 20, 'Tecnología'),
+		(10, 11, 'Administración');
+
+INSERT INTO EMPLEADOS (COD_EMPLEADO, APELLIDO, NOMBRE, FECHA_NACIMIENTO, NUM_DOC, COD_JEFE, COD_OFICINA, COD_DOCUMENTO)
+VALUES	(1, 'Leftley', 'Sophi', '1988-10-07', 25828801, 42, 10, 4),
+		(2, 'Mallows', 'Adoree', '1990-12-04', 47900101, 40, 10, 3),
+		(3, 'Gothard', 'Gwyneth', '1989-01-23', 15044899, 45, 7, 2),
+		(4, 'Beckinsall', 'Aindrea', '1993-03-22', 21190722, 42, 6, 1),
+		(5, 'Garwell', 'Nels', '1973-05-21', 29472012, 38, 10, 5),
+		(6, 'MacWhan', 'Kerri', '1991-07-19', 41890364, 33, 8, 3),
+		(7, 'Ledwidge', 'Faun', '1974-07-04', 34810419, 41, 3, 1),
+		(8, 'Duckham', 'Jase', '1989-05-21', 41206783, 24, 7, 2),
+		(9, 'Fawcus', 'Corly', '1980-09-11', 6120041, 44, 7, 1),
+		(10, 'Pinn', 'Kaia', '1972-01-25', 34949095, 41, 5, 2),
+		(11, 'Gómez', 'María', '1989-05-21', 41206783, 24, 7, 2),
+		(12, 'Fernández', 'María', '1980-09-11', 6120041, 44, 7, 1),
+		(13, 'López', 'María', '1972-01-25', 34949095, 41, 5, 2);
+
+INSERT INTO DATOS_CONTRATOS (COD_EMPLEADO, FECHA_CONTRATO, CUOTA, VENTAS)
+VALUES	(1, '2023-03-29', 14, 6),
+		(2, '2022-06-19', 25, 9),
+		(3, '2023-09-23', 26, 2),
+		(4, '2023-09-01', 31, 6),
+		(5, '2023-10-19', 25, 1),
+		(6, '2022-06-30', 3, 2),
+		(7, '2022-01-17', 1, 6),
+		(8, '2020-10-18', 23, 1),
+		(9, '2022-06-28', 7, 10),
+		(10, '2022-01-23', 32, 5);
+
+INSERT INTO FABRICANTES (COD_FABRICANTE, RAZON_SOCIAL)
+VALUES	(1, 'Kreiger Inc'),
+		(2, 'Johnson Inc'),
+		(3, 'Hodkiewicz Inc'),
+		(4, 'O Keefe-Cormier'),
+		(5, 'Roberts Inc'),
+		(6, 'Klein-Hauck'),
+		(7, 'Fadel LLC'),
+		(8, 'Runolfs, Stamm and Bruen'),
+		(9, 'McDermott LLC'),
+		(10, 'Kshlerin, Huels and Grant');
+
+INSERT INTO LISTAS (COD_LISTA, DESCRIPCION, GANANCIA)
+VALUES	(1, 'Descripción 1', 15947.78),
+		(2, 'Descripción 2', 24538.29),
+		(3, 'Descripción 3', 85361.62),
+		(4, 'Descripción 4', 60826.34),
+		(5, 'Descripción 5', 54519.53),
+		(6, 'Descripción 6', 14541.9),
+		(7, 'Descripción 7', 36383.85),
+		(8, 'Descripción 8', 84778.79),
+		(9, 'Descripción 9', 90314.71),
+		(10, 'Descripción 10', 27335.35);
+
+INSERT INTO PRODUCTOS (COD_PRODUCTO, DESCRIPCION, PRECIO, CANTIDAD_STOCK, PUNTO_REPOSICION, COD_FABRICANTE)
+VALUES	(1, 'Laptop', 50901.4, 75, 4, 5),
+		(2, 'Smartphone', 66954.33, 82, 5, 6),
+		(3, 'Headphones', 83076.03, 89, 0, 2),
+		(4, 'Camera', 35726.73, 81, 6, 8),
+		(5, 'Tablet', 82769.27, 33, 4, 4),
+		(6, 'Smartwatch', 53778.94, 84, 2, 6),
+		(7, 'Speaker', 13181.93, 65, 7, 7),
+		(8, 'Gaming Console', 93699.13, 27, 5, 7),
+		(9, 'Fitness Tracker', 69087.87, 34, 6, 2),
+		(10, 'Portable Charger', 17566.55, 15, 8, 10);
+
+INSERT INTO PRECIOS (COD_PRODUCTO, COD_LISTA, PRECIO)
+VALUES	(5, 10, 58486.62),
+		(4, 5, 14574.83),
+		(2, 6, 55144.91),
+		(4, 6, 26740.07),
+		(6, 4, 2494.85),
+		(10, 9, 37306.85),
+		(8, 5, 81675.06),
+		(10, 7, 88685.0),
+		(10, 5, 95686.19),
+		(3, 6, 68582.25);
+
+INSERT INTO CLIENTES (COD_CLIENTE, COD_LISTA, RAZON_SOCIAL)
+VALUES	(1, 1, 'Dooley Group'),
+		(2, 7, 'Schmitt-Ortiz'),
+		(3, 4, 'Sauer-Gorczany'),
+		(4, 9, 'Grimes-Reinger'),
+		(5, 5, 'Feest, Cormier and Hickle'),
+		(6, 2, 'Friesen, Metz and Boyer'),
+		(7, 9, 'Hilpert-Beahan'),
+		(8, 9, 'Leffler and Sons'),
+		(9, 4, 'McKenzie-Kirlin'),
+		(10, 3, 'Larson, Mills and Abshire');
+
+INSERT INTO PEDIDOS (COD_PEDIDO, FECHA_PEDIDO, COD_EMPLEADO, COD_CLIENTE)
+VALUES	(1, '2020-11-16', 4, 3),
+		(2, '2022-07-17', 7, 7),
+		(3, '2020-07-11', 9, 1),
+		(4, '2021-09-14', 3, 9),
+		(5, '2020-12-19', 1, 5),
+		(6, '2020-12-11', 10, 5),
+		(7, '2021-07-27', 9, 1),
+		(8, '2022-05-08', 7, 10),
+		(9, '2022-08-11', 3, 4),
+		(10, '2021-01-08', 8, 2),
+		(11, '2022-03-10', 2, 8),
+		(12, '2024-02-08', 5, 2),
+		(13, '2020-03-28', 8, 1);
+
+INSERT INTO DETALLE_PEDIDOS (COD_PEDIDO, NUMERO_LINEA, COD_PRODUCTO, CANTIDAD)
+VALUES	(9, 7, 9, 84),
+		(1, 4, 2, 78),
+		(6, 1, 1, 64),
+		(5, 15, 2, 69),
+		(10, 22, 4, 12),
+		(9, 18, 1, 22),
+		(2, 10, 5, 40),
+		(10, 3, 5, 43),
+		(2, 25, 1, 51),
+		(7, 13, 7, 80);
+
+-- Resolver las siguientes consultas utilizando sentencias SQL: 
+
+--		Consultas simples (una sola tabla)
+
+-- 1) Obtener una lista con los nombres de las distintas oficinas de la empresa. 
+
+SELECT O.DESCRIPCION
+FROM OFICINAS O;
+
+-- 2) Obtener una lista de todos los productos indicando descripción del producto, su precio de costo y su precio de costo IVA incluído (tomar el IVA como 21%). 
+
+SELECT 	P.DESCRIPCION AS DESCRIPCION_PRODUCTO, 
+		P.PRECIO AS PRECIO_DE_COSTO, 
+		TRUNCATE(P.PRECIO + P.PRECIO * 21/100, 2) AS PRECIO_CON_IVA
+FROM PRODUCTOS P;
+
+-- 3) Obtener una lista indicando para cada empleado apellido, nombre, fecha de cumpleaños y edad. 
+
+SELECT 	E.APELLIDO AS APELLIDO,
+		E.NOMBRE AS NOMBRE,
+		CONCAT(DAY(E.FECHA_NACIMIENTO), '/', MONTH(E.FECHA_NACIMIENTO)) AS FECHA_DE_CUMPLEAÑOS,
+		TIMESTAMPDIFF(YEAR, E.FECHA_NACIMIENTO, CURDATE()) AS EDAD
+FROM EMPLEADOS E;
+
+-- 4) Listar todos los empleados que tiene un jefe asignado.
+
+SELECT * 
+FROM EMPLEADOS E
+WHERE E.COD_JEFE IS NULL;
+
+-- 5) Listar los empleados de nombre “María” ordenado por apellido.
+
+SELECT *
+FROM EMPLEADOS E
+WHERE UPPER(E.NOMBRE) LIKE 'MARIA%'
+ORDER BY E.APELLIDO;
+
+-- 6) Listar los clientes cuya razón social comience con “L” ordenado por código de cliente.
+
+SELECT *
+FROM CLIENTES C
+WHERE UPPER(C.RAZON_SOCIAL) LIKE 'L%'
+ORDER BY C.COD_CLIENTE;
+
+-- 7) Listar toda la información de los pedidos de Marzo ordenado por fecha de pedido.
+
+SELECT *
+FROM PEDIDOS P
+WHERE MONTH(P.FECHA_PEDIDO) = 3
+ORDER BY P.FECHA_PEDIDO;
+
+-- 8) Listar las oficinas que no tienen asignado director.
+
+SELECT *
+FROM OFICINAS O
+WHERE O.CODIGO_DIRECTOR IS NULL;
+
+-- 9) Listar los 4 productos de menor precio de costo.
+
+SELECT *
+FROM PRODUCTOS P
+ORDER BY P.PRECIO ASC
+LIMIT 4;
+
+-- 10) Listar los códigos de empleados de los tres que tengan la mayor cuota.
+
+SELECT D.COD_EMPLEADO AS CODIGO_EMPLEADO
+FROM DATOS_CONTRATOS D
+ORDER BY D.CUOTA DESC
+LIMIT 3;
+
+--		Consultas multitablas
+
+-- 1) De cada producto listar descripción, razón social del fabricante y stock ordenado por razón social y descripción.
+
+
+
+-- 2) De cada pedido listar código de pedido, fecha de pedido, apellido del empleado y razón social del cliente.
+
+
+
+-- 3) Listar por cada empleado apellido, cuota asignada, oficina a la que pertenece ordenado en forma descendente por cuota.
+
+
+
+-- 4) Listar sin repetir la razón social de todos aquellos clientes que hicieron pedidos en Abril.
+
+
+
+-- 5) Listar sin repetir los productos que fueron pedidos en Marzo.
+
+
+
+-- 6) Listar aquellos empleados que están contratados por más de 10 años ordenado por cantidad de años en forma descendente.
+
+
+
+-- 7) Obtener una lista de los clientes mayoristas ordenada por razón social.
+
+
+
+-- 8) Obtener una lista sin repetir que indique qué productos compró cada cliente, ordenada por razón social y descripción.
+
+
+
+-- 9) Obtener una lista con la descripción de aquellos productos cuyo stock está por debajo del punto de reposición indicando cantidad a comprar y razón social del fabricante ordenada por razón social y descripción.
+
+
+
+-- 10) Listar aquellos empleados cuya cuota es menor a 50000 o mayor a 100000.
+
+
+
+
