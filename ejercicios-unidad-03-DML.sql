@@ -88,7 +88,8 @@ WHERE 	PROD.PNRO = ENVIOS.PNRO
 
 -- 5) Obtener la cantidad total del producto 001 enviado por el proveedor 103. 
 
-SELECT COUNT(ENVIOS.CANTIDAD)
+--! Entregue con COUNT y era SUM.
+SELECT SUM(ENVIOS.CANTIDAD)
 FROM PROV_PROD ENVIOS
 WHERE 	ENVIOS.NUMERO = 103
 	AND ENVIOS.PNRO = 1;
@@ -107,6 +108,13 @@ WHERE PROV.NUMERO = 102
 	AND PROV.NUMERO = ENVIOS.NUMERO
 	AND ENVIOS.PNRO = PROD.PNRO;
 
+--! Correccion del profesor 
+SELECT DISTINCT PROD.PRECIO
+FROM PRODUCTOS PROD, PROV_PROD ENVIOS
+WHERE ENVIOS.NUMERO = 102
+	AND ENVIOS.PNRO = PROD.PNRO;
+
+
 -- 8) Construir una lista de todas las localidades en las cuales esté situado por lo menos un proveedor o un producto. 
 
 SELECT DISTINCT LOCALIDAD
@@ -123,7 +131,8 @@ WHERE UPPER(PROD.TAMAÑO) = 'MEDIANO';
 
 -- 10) Eliminar todos los productos para los cuales no haya envíos. 
 
-DELETE FROM PRODUCTOS P
+DELETE 
+FROM PRODUCTOS P
 WHERE P.PNRO NOT IN (
 	SELECT DISTINCT ENVIOS.PNRO
 	FROM PROV_PROD ENVIOS
@@ -229,25 +238,28 @@ VALUES	(1, 4, 7, 657.33),
 
 -- 1. Obtener la cantidad de unidades máxima.
 
-SELECT MAX(CANTIDAD)
+SELECT MAX(CANTIDAD) AS CANTIDAD
 FROM ITEM_VENTAS;
 
 -- 2. Obtener la cantidad total de unidades vendidas del producto c. 
 
-SELECT SUM(CANTIDAD)
+SELECT SUM(CANTIDAD) AS TOTAL
 FROM ITEM_VENTAS
 WHERE CÓDIGO_PRODUCTO = 3;
 
 -- 3. Cantidad de unidades vendidas por producto, indicando la descripción del producto, ordenado de mayor a menor por las cantidades vendidas.  
 
-SELECT SUM(I.CANTIDAD) AS CANTIDAD, P.NOMBRE_PRODUCTO AS DESCRIPCION_PRODUCTO 
+SELECT 	SUM(I.CANTIDAD) AS CANTIDAD, 
+		P.NOMBRE_PRODUCTO AS DESCRIPCION_PRODUCTO 
 FROM ITEM_VENTAS I
 JOIN PRODUCTOS P ON I.CÓDIGO_PRODUCTO = P.CÓDIGO_PRODUCTO
-GROUP BY P.CÓDIGO_PRODUCTO;
+GROUP BY P.CÓDIGO_PRODUCTO
+ORDER BY SUM(I.CANTIDAD) DESC;
 
 -- 4. Cantidad de unidades vendidas por producto, indicando la descripción del producto, ordenado alfabéticamente por nombre de producto para los productos que vendieron más de 30 unidades.  
 
-SELECT SUM(I.CANTIDAD) AS CANTIDAD, P.NOMBRE_PRODUCTO AS  DESCRIPCION_PRODUCTO 
+SELECT 	SUM(I.CANTIDAD) AS CANTIDAD, 
+		P.NOMBRE_PRODUCTO AS  DESCRIPCION_PRODUCTO 
 FROM ITEM_VENTAS I
 JOIN PRODUCTOS P ON I.CÓDIGO_PRODUCTO = P.CÓDIGO_PRODUCTO
 GROUP BY P.CÓDIGO_PRODUCTO
@@ -256,7 +268,9 @@ ORDER BY DESCRIPCION_PRODUCTO ASC;
 
 -- 5. Obtener cuantas compras (1 factura = 1 compra) realizó cada cliente indicando el código y nombre del cliente ordenado de mayor a menor.  
 
-SELECT COUNT(V.NÚMERO_FACTURA) AS CANTIDAD_COMPRAS, V.CÓDIGO_CLIENTE AS CÓDIGO_CLIENTE, C.NOMBRE AS NOMBRE_CLIENTE
+SELECT 	COUNT(V.NÚMERO_FACTURA) AS CANTIDAD_COMPRAS, 
+		V.CÓDIGO_CLIENTE AS CÓDIGO_CLIENTE, 
+		C.NOMBRE AS NOMBRE_CLIENTE
 FROM VENTAS V
 JOIN CLIENTES C ON V.CÓDIGO_CLIENTE = C.CÓDIGO_CLIENTE
 GROUP BY V.CÓDIGO_CLIENTE
@@ -264,7 +278,8 @@ ORDER BY C.NOMBRE DESC;
 
 -- 6. Promedio de unidades vendidas por producto, indicando el código del producto para el cliente 1. 
 
-SELECT P.CÓDIGO_PRODUCTO AS CÓDIGO_PRODUCTO, AVG(I.CANTIDAD) AS PROMEDIO_UNIDADES_VENDIDAS
+SELECT 	P.CÓDIGO_PRODUCTO AS CÓDIGO_PRODUCTO, 
+		AVG(I.CANTIDAD) AS PROMEDIO_UNIDADES_VENDIDAS
 FROM ITEM_VENTAS I
 JOIN PRODUCTOS P ON I.CÓDIGO_PRODUCTO = P.CÓDIGO_PRODUCTO
 WHERE I.NÚMERO_FACTURA IN (
@@ -533,7 +548,7 @@ VALUES	(9, 7, 9, 84),
 
 -- 1) Obtener una lista con los nombres de las distintas oficinas de la empresa. 
 
-SELECT O.DESCRIPCION
+SELECT DISTINCT O.DESCRIPCION
 FROM OFICINAS O;
 
 -- 2) Obtener una lista de todos los productos indicando descripción del producto, su precio de costo y su precio de costo IVA incluído (tomar el IVA como 21%). 
@@ -555,7 +570,7 @@ FROM EMPLEADOS E;
 
 SELECT * 
 FROM EMPLEADOS E
-WHERE E.COD_JEFE IS NULL;
+WHERE E.COD_JEFE IS NOT NULL;
 
 -- 5) Listar los empleados de nombre “María” ordenado por apellido.
 
@@ -659,6 +674,15 @@ FROM CLIENTES C
 JOIN PEDIDOS P ON C.COD_CLIENTE = P.COD_CLIENTE
 JOIN DETALLE_PEDIDOS D ON P.COD_PEDIDO = D.COD_PEDIDO
 WHERE D.CANTIDAD > 50;
+
+--! CORRECCION DEL PROFESOR
+SELECT 	C.COD_CLIENTE,
+		C.RAZON_SOCIAL,
+		C.COD_LISTA
+FROM CLIENTES C, LISTAS L
+WHERE 	C.COD_LISTA = L.COD_LISTA
+	AND UPPER(L.DESCRIPCION) = 'MAYORISTA'
+ORDER BY C.RAZON_SOCIAL;
 
 -- 8) Obtener una lista sin repetir que indique qué productos compró cada cliente, ordenada por razón social y descripción.
 
